@@ -19,38 +19,26 @@ bool NykoMiniboss::initialize() {
   if (!requestControllerIdentity(identityBuffer)) {
     return false;
   }
-//  if(requestControllerIdentity(identityBuffer)) {
-//    Serial.print("Identity=");
-//    for (byte i = 0; i < MINIBOSS_IDENTITY_BUFFER_SIZE; i++) {
-//      Serial.print(identityBuffer[i], HEX);
-//      Serial.print(' ');
-//    }
-//    Serial.println();
-//  } else {
-//    Serial.println("ERROR: Unable to identify the controller");
-//    return false;
-//  }
+  
   update();
   return true;
 }
 
-bool NykoMiniboss::isPressingA() { return !(_buffer[7] & 0x10); }
-bool NykoMiniboss::isPressingB() { return !(_buffer[7] & 0x40); }
-bool NykoMiniboss::isPressingDown() { return !(_buffer[6] & 0x40); }
-bool NykoMiniboss::isPressingLeft() { return !(_buffer[7] & 0x02); }
-bool NykoMiniboss::isPressingPower() { return !(_buffer[6] & 0x08); }
-bool NykoMiniboss::isPressingRight() { return !(_buffer[6] & 0x80); }
-bool NykoMiniboss::isPressingSelect() { return !(_buffer[6] & 0x10); }
-bool NykoMiniboss::isPressingStart() { return !(_buffer[6] & 0x04); }
-bool NykoMiniboss::isPressingUp() { return !(_buffer[7] & 0x01); }
-
-//void NykoMiniboss::print() {
-//  for(byte i = 0; i < MINIBOSS_BUFFER_SIZE; i++) {
-//    Serial.print(_buffer[i], HEX);
-//    Serial.print(' ');
-//  }
-//  Serial.println();
-//}
+/* Button codes returned from this method(hex provided for convenience)
+ *        -----BINARY------ --HEX-
+ * UP     00000000 00000001 0x0001
+ * LEFT   00000000 00000010 0x0002
+ * A      00000000 00010000 0x0010
+ * B      00000000 01000000 0x0040
+ * START  00000100 00000000 0x0400
+ * POWER  00001000 00000000 0x0800
+ * SELECT 00010000 00000000 0x1000
+ * DOWN   01000000 00000000 0x4000
+ * RIGHT  10000000 00000000 0x8000
+ */
+uint16_t NykoMiniboss::getButtonState() {
+  return ~((_buffer[6] << 8) | _buffer[7]);
+}
 
 /* identityBuffer must point to an Array of size MINIBOSS_IDENTITY_BUFFER_SIZE. */
 bool NykoMiniboss::requestControllerIdentity(byte* identityBuffer) {
@@ -72,7 +60,6 @@ void NykoMiniboss::requestData() {
 }
 
 bool NykoMiniboss::update() {
-  delay(100);
   Wire.requestFrom(MINIBOSS_I2C_ID, MINIBOSS_BUFFER_SIZE);
   byte bytesRead = 0;
   while(Wire.available() && bytesRead < MINIBOSS_BUFFER_SIZE) {

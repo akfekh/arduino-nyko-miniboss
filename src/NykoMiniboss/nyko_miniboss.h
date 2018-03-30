@@ -3,21 +3,14 @@
 #define MINIBOSS_IDENTITY_BUFFER_SIZE 6
 #define MINIBOSS_BUFFER_SIZE 8
 #define MINIBOSS_I2C_ID 0x52
+#define MB_ERROR_UNABLE_TO_INIT 1
+#define MB_ERROR_
 
 class NykoMiniboss {
   public:
     bool initialize();
     bool update();
-//    void print();
-    bool isPressingA();
-    bool isPressingB();
-    bool isPressingDown();
-    bool isPressingLeft();
-    bool isPressingPower();
-    bool isPressingRight();
-    bool isPressingSelect();
-    bool isPressingStart();
-    bool isPressingUp();
+    uint16_t getButtonState();
 
   private:
     void requestData();
